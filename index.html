@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="robots" content="noindex, nofollow" />
-<title>Ortzi — Générateur de devis</title>
+<title>Ortzi — Générateur de documents</title>
 <style>
   * { box-sizing: border-box; }
   body { margin:0; background:#DFE4E9; font-family:'Segoe UI', system-ui, -apple-system, sans-serif; color:#2B3A4A; }
@@ -16,8 +16,7 @@
   .card { background:#fff; border-radius:12px; padding:16px; box-shadow:0 1px 3px rgba(43,58,74,.08); }
   .h { font-size:12px; font-weight:700; color:#1E88C7; text-transform:uppercase; letter-spacing:.6px; display:block; margin-bottom:8px; }
   label.fl { font-size:11px; color:#6B7885; display:block; margin-bottom:3px; }
-  input, textarea { width:100%; border:1px solid #B9C2CC; border-radius:8px; padding:8px 10px; font-size:13px; font-family:inherit; }
-  textarea { resize:vertical; }
+  input { width:100%; border:1px solid #B9C2CC; border-radius:8px; padding:8px 10px; font-size:13px; font-family:inherit; }
   .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   .fld { margin-bottom:8px; }
   button { border:none; border-radius:8px; cursor:pointer; font-family:inherit; font-weight:600; }
@@ -25,21 +24,25 @@
   .btnDark { background:#2B3A4A; color:#fff; }
   .chip { border:1px solid #B9C2CC; background:#fff; color:#2B3A4A; border-radius:20px; padding:6px 12px; font-size:12px; }
   .chip.active { background:#1E88C7; color:#fff; border-color:#1E88C7; }
+  .docTabs { display:flex; gap:6px; flex-wrap:wrap; }
+  .docTab { flex:1 1 auto; border:1px solid #B9C2CC; background:#fff; color:#6B7885; border-radius:8px; padding:9px 8px; font-size:11.5px; text-align:center; }
+  .docTab.active { background:#2B3A4A; color:#fff; border-color:#2B3A4A; }
   .row { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
   .addChip { border:1px dashed #1E88C7; background:#F5FAFD; color:#1E88C7; border-radius:8px; padding:5px 9px; font-size:11.5px; }
   .addChip.custom { border-color:#6B7885; color:#6B7885; background:#F7F8F9; }
   .ligne { display:flex; gap:6px; margin-bottom:6px; align-items:center; }
   .del { background:#F0D5D2; color:#C0392B; border-radius:6px; width:30px; height:30px; font-size:18px; flex-shrink:0; }
   .hint { font-size:11px; color:#6B7885; text-align:center; margin:0; }
-
+  .warn { font-size:11.5px; color:#8A6D00; background:#FDF6E3; border:1px solid #EFD9A0; border-radius:8px; padding:9px 11px; line-height:1.5; margin:10px 0 0; }
+ 
   .previewWrap { flex:1 1 480px; display:flex; justify-content:center; }
-  .devis { background:#fff; width:620px; max-width:100%; min-height:877px; padding:34px; box-shadow:0 4px 20px rgba(43,58,74,.15); font-size:12px; }
-  .devHeader { display:flex; justify-content:space-between; align-items:center; background:#2B3A4A; margin:-34px -34px 20px; padding:20px 34px; color:#fff; }
-  .devBrand { font-size:30px; font-weight:800; letter-spacing:-1px; }
+  .doc { background:#fff; width:210mm; max-width:100%; min-height:297mm; padding:14mm 16mm; box-shadow:0 4px 20px rgba(43,58,74,.15); font-size:11.2px; display:flex; flex-direction:column; }
+  .docHeader { display:flex; justify-content:space-between; align-items:center; background:#2B3A4A; margin:-14mm -16mm 6mm; padding:9mm 16mm; color:#fff; }
+  .docBrand { font-size:30px; font-weight:800; letter-spacing:-1px; }
   .dot { color:#1E88C7; margin-left:2px; }
-  .devTitle { font-size:20px; font-weight:800; text-align:right; }
-  .devSub, .devMeta { font-size:11px; color:#B9C2CC; text-align:right; }
-  .devMeta { font-size:10px; margin-top:2px; }
+  .docTitle { font-size:20px; font-weight:800; text-align:right; }
+  .docSub, .docMeta { font-size:11px; color:#B9C2CC; text-align:right; }
+  .docMeta { font-size:10px; margin-top:2px; }
   .parties { display:flex; gap:10px; margin-bottom:16px; }
   .partie { flex:1; border:1px solid #B9C2CC; border-radius:6px; padding:10px; }
   .partie.grey { background:#EEF3F7; }
@@ -55,43 +58,86 @@
   .tdStrong { font-size:11.5px; font-weight:700; }
   .tdDesc { font-size:9.5px; color:#8A97A3; margin-top:2px; }
   .bottom { display:flex; gap:16px; margin-bottom:16px; }
-  .recurrent { flex:1; }
+  .leftCol { flex:1; }
   .recBig { font-size:16px; font-weight:800; margin-bottom:3px; }
   .condList { margin:4px 0 0; padding:0; list-style:none; font-size:10px; color:#6B7885; line-height:1.7; }
-  .totaux { width:220px; align-self:flex-start; }
+  .totaux { width:230px; align-self:flex-start; }
   .totRow { display:flex; justify-content:space-between; border:1px solid #E0E5EA; padding:7px 10px; font-size:11px; }
   .totRow.hi { background:#1E88C7; color:#fff; font-weight:700; border:none; }
+  .totRow.sub { background:#F7F9FB; font-size:10.5px; color:#6B7885; }
   .accord { border:1px solid #B9C2CC; border-radius:6px; padding:12px; margin-bottom:14px; }
-  .devFoot { font-size:9px; color:#8A97A3; text-align:center; border-top:1px solid #E0E5EA; padding-top:10px; }
-
+  .sigs { display:flex; gap:10px; margin-bottom:14px; }
+  .sig { flex:1; border:1px solid #B9C2CC; border-radius:6px; padding:11px; min-height:80px; }
+  .docFoot { font-size:9px; color:#8A97A3; text-align:center; border-top:1px solid #E0E5EA; padding-top:10px; }
+  .legal { font-size:9px; color:#6B7885; line-height:1.6; margin-bottom:12px; }
+  .legal strong { color:#C0392B; }
+ 
+  /* --- Page CGV --- */
+  .cgvWrap { width:100%; margin-top:24px; display:flex; justify-content:center; }
+  .cgvPage { padding:12mm 16mm; }
+  .cgvHead { display:flex; justify-content:space-between; align-items:baseline; background:#2B3A4A; color:#fff; margin:-12mm -16mm 5mm; padding:5mm 16mm; font-size:12.5px; font-weight:800; }
+  .cgvHeadSub { font-size:9.5px; font-weight:400; color:#B9C2CC; }
+  .cgvCols { column-count:2; column-gap:16px; }
+  .cgvArt { break-inside:avoid; margin-bottom:7px; }
+  .cgvArtT { font-size:8.4px; font-weight:700; color:#1E88C7; margin-bottom:2px; }
+  .cgvArtB { font-size:7.4px; color:#4A5560; line-height:1.42; text-align:justify; margin:0; }
+  .cgvFoot { font-size:8px; color:#6B7885; text-align:center; margin-top:12px; border-top:1px solid #E0E5EA; padding-top:8px; }
+ 
   @media print {
     .no-print { display:none !important; }
+    .cgvWrap { page-break-before:always; break-before:page; margin-top:0; display:flex !important; }
+    .cgvPage { box-shadow:none; width:100%; min-height:0; padding:0; }
+    .cgvHead { margin:0 0 5mm; padding:4mm 6mm; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
     body { background:#fff; }
-    .wrap { padding:0; gap:0; }
+    .wrap { padding:0; gap:0; display:block; }
     .previewWrap { display:block; }
-    .devis { box-shadow:none; width:100%; min-height:0; padding:0; }
-    .devHeader { margin:0 0 20px; padding:16px 20px; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-    th, .totRow.hi, .partie.grey, td.grey { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
-    @page { size:A4; margin:12mm; }
+    .doc { box-shadow:none; width:100%; min-height:0; padding:0; display:block; }
+    .docHeader { margin:0 0 6mm; padding:6mm 8mm; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    th, .totRow.hi, .partie.grey, td.grey, .totRow.sub { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .docFoot { margin-top:auto; }
+    @page { size:A4 portrait; margin:12mm; }
   }
-  @media (max-width:900px) { .devis { width:100%; padding:20px; } .devHeader { margin:-20px -20px 16px; padding:16px 20px; } }
+  @media (max-width:900px) {
+    .doc { width:100%; min-height:0; padding:16px; }
+    .docHeader { margin:-16px -16px 14px; padding:14px 16px; }
+    .cgvPage { padding:16px; }
+    .cgvHead { margin:-16px -16px 12px; padding:10px 16px; }
+    .cgvCols { column-count:1; }
+    .bottom { flex-direction:column; }
+    .totaux { width:100%; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
-
-  <!-- ===== SAISIE ===== -->
+ 
   <div class="editor no-print">
-    <div class="brandRow"><span class="brand">ortzi</span><span class="brandSub">Générateur de devis</span></div>
-
+    <div class="brandRow"><span class="brand">ortzi</span><span class="brandSub">Générateur de documents</span></div>
+ 
     <div class="card">
-      <span class="h">Devis</span>
+      <span class="h">Type de document</span>
+      <div class="docTabs" id="docTabs"></div>
+      <p class="warn" id="factWarn" style="display:none">Une facture exige un SIRET et une numérotation séquentielle continue. À n'émettre qu'une fois la SAS immatriculée.</p>
+    </div>
+ 
+    <div class="card">
+      <span class="h">Références</span>
       <div class="grid2">
-        <div class="fld"><label class="fl">N° de devis</label><input id="numero" value="DEV-2026-001"></div>
+        <div class="fld"><label class="fl">N° du document</label><input id="numero" value="DEV-2026-001"></div>
         <div class="fld"><label class="fl">Date</label><input id="date"></div>
       </div>
+      <div class="grid2">
+        <div class="fld"><label class="fl">Réf. document lié</label><input id="refDevis" placeholder="DEV-2026-001"></div>
+        <div class="fld"><label class="fl">Échéance (facture)</label><input id="echeance" placeholder="à réception"></div>
+      </div>
     </div>
-
+ 
+    <div class="card">
+      <span class="h">Émetteur</span>
+      <div class="fld"><label class="fl">SIRET (vide = en cours de formation)</label><input id="siretOrtzi" placeholder="en cours d'immatriculation"></div>
+      <div class="fld"><label class="fl">Email / contact</label><input id="mailOrtzi" placeholder="contact@ortzi.fr"></div>
+    </div>
+ 
     <div class="card">
       <span class="h">Client</span>
       <div class="fld"><label class="fl">Nom / raison sociale</label><input id="cNom"></div>
@@ -104,7 +150,7 @@
         <div class="fld"><label class="fl">SIRET</label><input id="cSiret"></div>
       </div>
     </div>
-
+ 
     <div class="card">
       <span class="h">Formule</span>
       <div class="row" id="formuleChips"></div>
@@ -113,43 +159,45 @@
         <div class="fld"><label class="fl">Abonnement HT (€/mois)</label><input id="mensuel" type="number"></div>
       </div>
     </div>
-
+ 
     <div class="card">
       <span class="h">Options & lignes</span>
       <div class="row" id="optChips"></div>
       <div id="lignes"></div>
     </div>
-
+ 
     <div class="card">
       <span class="h">Conditions</span>
       <div class="grid2">
         <div class="fld"><label class="fl">Acompte (%)</label><input id="acompte" type="number" value="30"></div>
         <div class="fld"><label class="fl">Délai (semaines)</label><input id="delai" type="number" value="4"></div>
       </div>
+      <div class="fld"><label class="fl">Prix de rachat du site HT (€) — art. 10</label><input id="rachat" type="number" placeholder="ex. 400"></div>
     </div>
-
+ 
     <button class="btn btnDark" onclick="window.print()">Imprimer / Exporter en PDF</button>
     <p class="hint">Dans la fenêtre d'impression, choisissez « Enregistrer en PDF ».</p>
   </div>
-
-  <!-- ===== APERÇU ===== -->
+ 
   <div class="previewWrap">
-    <div class="devis">
-      <div class="devHeader">
-        <div class="devBrand">ortzi<span class="dot">•</span></div>
+    <div class="doc">
+      <div class="docHeader">
+        <div class="docBrand">ortzi<span class="dot">&bull;</span></div>
         <div>
-          <div class="devTitle">DEVIS</div>
-          <div class="devSub">Création de site internet</div>
-          <div class="devMeta"><span id="pNumero"></span> — <span id="pDate"></span></div>
+          <div class="docTitle" id="pTitle">DEVIS</div>
+          <div class="docSub">Création de site internet</div>
+          <div class="docMeta"><span id="pNumero"></span> — <span id="pDate"></span></div>
+          <div class="docMeta" id="pRef"></div>
         </div>
       </div>
-
+ 
       <div class="parties">
         <div class="partie grey">
           <div class="pLabel">ÉMETTEUR</div>
-          <div class="pStrong">ORTZI — SAS en cours de formation</div>
+          <div class="pStrong" id="pOrtzi">ORTZI — SAS en cours de formation</div>
           <div class="pLine">Pays Basque (Bayonne-Anglet-Biarritz)</div>
-          <div class="pLine">SIRET : en cours d'immatriculation</div>
+          <div class="pLine" id="pMailOrtzi"></div>
+          <div class="pLine" id="pSiretOrtzi">SIRET : en cours d'immatriculation</div>
         </div>
         <div class="partie">
           <div class="pLabel">CLIENT</div>
@@ -159,136 +207,309 @@
           <div class="pLine" id="pSiret"></div>
         </div>
       </div>
-
+ 
       <table>
         <thead><tr><th class="left">Désignation</th><th>Total HT</th></tr></thead>
         <tbody id="pTable"></tbody>
       </table>
-
+ 
       <div class="bottom">
-        <div class="recurrent">
-          <div class="pLabel">PUIS ABONNEMENT</div>
+        <div class="leftCol">
+          <div class="pLabel" id="pRecLabel">PUIS ABONNEMENT</div>
           <div class="recBig" id="pRec"></div>
-          <div class="pLine">Hébergement, maintenance et mises à jour inclus.</div>
+          <div class="pLine" id="pRecNote">Hébergement, maintenance et mises à jour inclus.</div>
           <div class="pLabel" style="margin-top:14px">CONDITIONS</div>
           <ul class="condList" id="pCond"></ul>
         </div>
         <div class="totaux" id="pTot"></div>
       </div>
-
-      <div class="accord">
-        <div class="pLabel">BON POUR ACCORD</div>
-        <div class="pLine">Date : ____________     Signature (précédée de « Bon pour accord ») :</div>
+ 
+      <div class="legal" id="pLegal"></div>
+      <div id="pSignZone"></div>
+      <div class="docFoot" id="pFoot"></div>
+    </div>
+  </div>
+ 
+  <!-- ===== PAGE CGV (verso) ===== -->
+  <div class="previewWrap cgvWrap" id="cgvWrap">
+    <div class="doc cgvPage">
+      <div class="cgvHead">
+        <span>CONDITIONS GÉNÉRALES DE VENTE</span>
+        <span class="cgvHeadSub">ORTZI — Prestations réservées aux professionnels</span>
       </div>
-
-      <div class="devFoot">ORTZI — SAS en cours de formation — Pays Basque — La signature du devis vaut acceptation et déclenche l'établissement du bon de commande.</div>
+      <div class="cgvCols" id="cgvBody"></div>
+      <div class="cgvFoot">ORTZI — Pays Basque (Bayonne-Anglet-Biarritz) — CGV applicables aux professionnels — Le Client reconnaît en avoir pris connaissance avant signature.</div>
     </div>
   </div>
 </div>
-
+ 
 <script>
-const FORMULES = {
+var FORMULES = {
   "vitrine-3d": { label:"Vitrine 3D", desc:"Site vitrine premium avec animations 3D interactives (WebGL)", prix:2500, mensuel:69 },
   "vitrine":    { label:"Vitrine", desc:"Site 1 à 5 pages, responsive, formulaire de contact", prix:490, mensuel:39 },
   "pro":        { label:"Pro", desc:"Site multi-pages, blog/actualités, SEO de base, sur-mesure", prix:890, mensuel:59 },
-  "ecommerce":  { label:"E-commerce", desc:"Boutique en ligne, paiement, gestion produits & commandes", prix:1490, mensuel:89 },
+  "ecommerce":  { label:"E-commerce", desc:"Boutique en ligne, paiement, gestion produits & commandes", prix:1490, mensuel:89 }
 };
-const OPTIONS_DEF = [
+var OPTIONS_DEF = [
   {label:"Prise de rendez-vous en ligne", prix:150},
   {label:"Pages supplémentaires", prix:0},
   {label:"Rédaction de contenu", prix:250},
   {label:"Photos / shooting", prix:300},
   {label:"Logo / identité visuelle", prix:0},
-  {label:"Multilingue (FR / ES / EU)", prix:0},
+  {label:"Multilingue (FR / ES / EU)", prix:0}
 ];
-
-let formule = "pro";
-let lignes = [];
-
-const $ = id => document.getElementById(id);
-const euro = n => (Number(n)||0).toLocaleString("fr-FR",{minimumFractionDigits:2,maximumFractionDigits:2}) + " €";
-
+var DOCS = {
+  devis:     { label:"Devis",           titre:"DEVIS",             prefix:"DEV" },
+  bon:       { label:"Bon de commande", titre:"BON DE COMMANDE",   prefix:"BC"  },
+  factAc:    { label:"Facture acompte", titre:"FACTURE D'ACOMPTE", prefix:"FA"  },
+  factSolde: { label:"Facture solde",   titre:"FACTURE DE SOLDE",  prefix:"FS"  }
+};
+ 
+var CGV = [
+["Article 1 — Objet et champ d'application","Les présentes conditions générales de vente (CGV) régissent les prestations de création de site internet et les services associés fournis par ORTZI (« le Prestataire ») à ses clients professionnels (« le Client »). Elles s'appliquent à l'exclusion de toute autre condition. Le Client déclare agir dans le cadre de son activité professionnelle ; les dispositions du Code de la consommation ne s'appliquent pas au présent contrat. La signature du bon de commande emporte acceptation sans réserve des présentes CGV."],
+["Article 2 — Nature de la prestation","La prestation associe la création d'un site internet et sa mise à disposition en ligne assortie de services d'hébergement, de nom de domaine et de maintenance, pour une durée d'engagement déterminée. Le site est fourni au Client sous forme d'un droit d'usage ; sa propriété demeure au Prestataire dans les conditions de l'article 8. Le prix de création est réglé par acompte à la commande puis solde à la livraison ; les services sont facturés selon la périodicité indiquée au bon de commande."],
+["Article 3 — Commande et prise d'effet","La commande est ferme et définitive dès la signature du bon de commande et le versement de l'acompte. Le Prestataire se réserve le droit de refuser une commande pour motif légitime. Toute modification du périmètre après signature fait l'objet d'un devis complémentaire."],
+["Article 4 — Prix et paiement","Les prix sont exprimés en euros hors taxes ; la TVA au taux en vigueur s'ajoute. Un acompte est exigible à la commande, le solde de la création à la livraison. Les services sont facturés selon la périodicité convenue au bon de commande pour la durée d'engagement."],
+["Article 5 — Acompte non remboursable","L'acompte versé à la commande correspond à la réservation du créneau de production et à l'engagement des premiers travaux (cadrage, maquettage). Il n'est en aucun cas remboursable en cas d'annulation ou de désistement du Client, quelle qu'en soit la cause, sans préjudice des sommes restant dues au titre des prestations déjà réalisées."],
+["Article 6 — Garantie « satisfait ou remboursé » 30 jours","Le Client bénéficie d'une garantie de satisfaction de trente (30) jours à compter de la mise en ligne du site. S'il n'est pas satisfait et le notifie par écrit dans ce délai, le Prestataire lui rembourse le solde de la création effectivement versé, à l'exclusion de l'acompte défini à l'article 5. Le site est alors mis hors ligne et l'ensemble des droits demeurent au Prestataire. Cette garantie ne s'applique qu'à la première mise en ligne et ne couvre pas les services déjà consommés."],
+["Article 7 — Délais, obligations du Client et recette","Les délais indiqués sont indicatifs et courent à compter de la réception de l'acompte et des éléments nécessaires (textes, images, accès). Le Client garantit détenir les droits sur les éléments transmis et demeure seul responsable de leur conformité aux lois. Il valide chaque étape ; à défaut de retour sous quinze (15) jours, les livrables sont réputés acceptés. La mise en ligne vaut livraison ; le Client dispose de sept (7) jours pour signaler par écrit toute non-conformité, après quoi la prestation est réputée acceptée."],
+["Article 8 — Propriété du site et licence d'usage","Le Prestataire demeure titulaire de l'ensemble des droits de propriété sur le site, son design, son code source et ses développements pendant toute la durée du contrat. Le Client bénéficie d'un droit d'usage personnel et non exclusif du site pour son activité, concédé pour la durée du contrat. Cette licence ne confère aucun droit de reproduction, de cession, de revente ou de modification du code sans accord écrit du Prestataire. Les contenus fournis par le Client (textes, images, logos) demeurent sa propriété et lui sont restitués sur simple demande."],
+["Article 9 — Durée d'engagement et reconduction","Le contrat est conclu pour une durée d'engagement initiale de douze (12) mois à compter de la mise en ligne, reconduite ensuite tacitement par périodes de douze (12) mois. Le Client peut y mettre fin à l'échéance en respectant un préavis d'un (1) mois notifié par écrit. En cas de résiliation anticipée du fait du Client avant le terme de la période d'engagement, les mensualités restant à courir jusqu'à l'échéance demeurent exigibles."],
+["Article 10 — Fin de contrat : rachat ou interruption","À l'issue de l'engagement, si le Client ne souhaite pas renouveler, il dispose de deux options : (i) demander le rachat du site afin d'en obtenir la propriété et de le migrer vers un autre hébergeur, moyennant le versement du prix de rachat indiqué au bon de commande ou, à défaut, au tarif de rachat en vigueur ; (ii) ne pas racheter le site, auquel cas celui-ci est mis hors ligne et le Prestataire conserve l'ensemble de ses développements. Les contenus propres du Client lui sont restitués dans tous les cas."],
+["Article 11 — Retard de paiement","Toute somme non réglée à échéance porte, de plein droit et sans mise en demeure, intérêts de retard au taux d'intérêt légal majoré, ainsi qu'une indemnité forfaitaire pour frais de recouvrement de quarante (40) euros par facture (art. L.441-10 et D.441-5 du Code de commerce). Le Prestataire peut suspendre toute prestation en cours, y compris la mise en ligne du site, jusqu'à complet règlement."],
+["Article 12 — Responsabilité","Le Prestataire est tenu à une obligation de moyens. Sa responsabilité ne peut être engagée qu'en cas de faute prouvée et se limite aux dommages directs et prévisibles, dans la limite des sommes effectivement versées au titre de la prestation concernée. Sont exclus les dommages indirects (perte d'exploitation, de chiffre d'affaires, de données ou de clientèle)."],
+["Article 13 — Disponibilité du service","Le Prestataire assure une obligation de moyens quant à la disponibilité de l'hébergement et n'est pas responsable des interruptions imputables à des tiers, à l'infrastructure du Client ou à un cas de force majeure. Le non-paiement d'une échéance autorise, après information du Client, la suspension du service et la mise hors ligne du site."],
+["Article 14 — Références commerciales","Sauf refus écrit du Client, le Prestataire est autorisé à mentionner le nom et le logo du Client, ainsi qu'une capture du site réalisé, à titre de référence sur ses supports de communication et son portfolio."],
+["Article 15 — Sous-traitance","Le Prestataire peut confier tout ou partie de l'exécution des prestations à des sous-traitants ou prestataires tiers de son choix, sans que l'accord préalable du Client soit requis. Le Prestataire demeure, dans ce cas, seul responsable de la bonne exécution des prestations à l'égard du Client."],
+["Article 16 — Révision des prix","Les prix des services récurrents peuvent être révisés annuellement, à la date anniversaire du contrat, par application de la variation de l'indice Syntec (ou de tout indice qui lui serait substitué). Le Prestataire informe le Client de la révision au moins un (1) mois avant son application. Le Client qui n'accepterait pas la révision peut résilier dans les conditions de l'article 9."],
+["Article 17 — Cession du contrat","Le Prestataire peut librement céder ou transférer le présent contrat, ainsi que les droits et obligations qui en découlent, à tout tiers de son choix, notamment dans le cadre d'une cession de son activité ou d'une réorganisation. Le Client en est informé et accepte par avance ce transfert, à condition qu'il n'en résulte aucune diminution de ses droits."],
+["Article 18 — Données personnelles","Chaque partie respecte la réglementation applicable (RGPD). Le Prestataire agit le cas échéant en qualité de sous-traitant pour les traitements réalisés pour le compte du Client, lequel demeure responsable de traitement des données collectées via son site."],
+["Article 19 — Force majeure","Aucune partie ne peut être tenue responsable d'un manquement résultant d'un cas de force majeure au sens de l'article 1218 du Code civil et de la jurisprudence française."],
+["Article 20 — Droit applicable et juridiction","Les présentes CGV sont soumises au droit français. À défaut de résolution amiable, tout litige relève de la compétence exclusive du Tribunal de commerce de Bayonne, nonobstant pluralité de défendeurs ou appel en garantie."]
+];
+ 
+var formule = "pro";
+var lignes = [];
+var docType = "devis";
+ 
+function $(id){ return document.getElementById(id); }
+function euro(n){ return (Number(n)||0).toLocaleString("fr-FR",{minimumFractionDigits:2,maximumFractionDigits:2}) + " €"; }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+ 
 $("date").value = new Date().toLocaleDateString("fr-FR");
-
-// chips formules
+ 
+function renderDocTabs(){
+  var box = $("docTabs"); box.innerHTML = "";
+  Object.keys(DOCS).forEach(function(k){
+    var d = DOCS[k];
+    var b = document.createElement("button");
+    b.className = "docTab" + (docType===k ? " active" : "");
+    b.textContent = d.label;
+    b.onclick = function(){
+      docType = k;
+      var n = $("numero").value.replace(/^[A-Z]+-/, "");
+      $("numero").value = d.prefix + "-" + n;
+      renderDocTabs(); render();
+    };
+    box.appendChild(b);
+  });
+  $("factWarn").style.display = (docType==="factAc"||docType==="factSolde") ? "block" : "none";
+}
+ 
 function renderFormuleChips(){
-  $("formuleChips").innerHTML = "";
-  Object.entries(FORMULES).forEach(([k,f])=>{
-    const b = document.createElement("button");
+  var box = $("formuleChips"); box.innerHTML = "";
+  Object.keys(FORMULES).forEach(function(k){
+    var f = FORMULES[k];
+    var b = document.createElement("button");
     b.className = "chip" + (formule===k ? " active" : "");
     b.textContent = f.label;
-    b.onclick = ()=>{ formule=k; $("prixCrea").value=f.prix; $("mensuel").value=f.mensuel; renderFormuleChips(); render(); };
-    $("formuleChips").appendChild(b);
+    b.onclick = function(){
+      formule = k;
+      $("prixCrea").value = f.prix;
+      $("mensuel").value = f.mensuel;
+      renderFormuleChips(); render();
+    };
+    box.appendChild(b);
   });
 }
-// chips options
-OPTIONS_DEF.forEach(o=>{
-  const b=document.createElement("button");
-  b.className="addChip"; b.textContent="+ "+o.label;
-  b.onclick=()=>{ lignes.push({label:o.label,prix:o.prix}); renderLignes(); render(); };
-  document.getElementById("optChips").appendChild(b);
+ 
+OPTIONS_DEF.forEach(function(o){
+  var b = document.createElement("button");
+  b.className = "addChip"; b.textContent = "+ " + o.label;
+  b.onclick = function(){ lignes.push({label:o.label, prix:o.prix}); renderLignes(); render(); };
+  $("optChips").appendChild(b);
 });
-{
-  const b=document.createElement("button");
-  b.className="addChip custom"; b.textContent="+ Ligne libre";
-  b.onclick=()=>{ lignes.push({label:"",prix:0}); renderLignes(); render(); };
-  document.getElementById("optChips").appendChild(b);
-}
-
+(function(){
+  var b = document.createElement("button");
+  b.className = "addChip custom"; b.textContent = "+ Ligne libre";
+  b.onclick = function(){ lignes.push({label:"", prix:0}); renderLignes(); render(); };
+  $("optChips").appendChild(b);
+})();
+ 
 function renderLignes(){
-  const c=$("lignes"); c.innerHTML="";
-  lignes.forEach((l,i)=>{
-    const d=document.createElement("div"); d.className="ligne";
-    const a=document.createElement("input"); a.value=l.label; a.placeholder="Désignation"; a.style.flex="1";
-    a.oninput=e=>{ lignes[i].label=e.target.value; render(); };
-    const p=document.createElement("input"); p.type="number"; p.value=l.prix; p.style.width="90px";
-    p.oninput=e=>{ lignes[i].prix=e.target.value; render(); };
-    const x=document.createElement("button"); x.className="del"; x.textContent="×";
-    x.onclick=()=>{ lignes.splice(i,1); renderLignes(); render(); };
-    d.append(a,p,x); c.appendChild(d);
+  var c = $("lignes"); c.innerHTML = "";
+  lignes.forEach(function(l, i){
+    var d = document.createElement("div"); d.className = "ligne";
+    var a = document.createElement("input");
+    a.value = l.label; a.placeholder = "Désignation"; a.style.flex = "1";
+    a.oninput = function(e){ lignes[i].label = e.target.value; render(); };
+    var p = document.createElement("input");
+    p.type = "number"; p.value = l.prix; p.style.width = "90px";
+    p.oninput = function(e){ lignes[i].prix = e.target.value; render(); };
+    var x = document.createElement("button");
+    x.className = "del"; x.textContent = "×";
+    x.onclick = function(){ lignes.splice(i,1); renderLignes(); render(); };
+    d.appendChild(a); d.appendChild(p); d.appendChild(x);
+    c.appendChild(d);
   });
 }
-
+ 
 function render(){
-  const f = FORMULES[formule];
-  const prixCrea = Number($("prixCrea").value)||0;
-  const mens = Number($("mensuel").value)||0;
-  const acPct = Number($("acompte").value)||0;
-  const delai = Number($("delai").value)||0;
-
+  var f = FORMULES[formule];
+  var prixCrea = Number($("prixCrea").value)||0;
+  var mens     = Number($("mensuel").value)||0;
+  var acPct    = Number($("acompte").value)||0;
+  var delai    = Number($("delai").value)||0;
+  var rachat   = Number($("rachat").value)||0;
+  var isFacture = (docType==="factAc" || docType==="factSolde");
+ 
+  $("pTitle").textContent  = DOCS[docType].titre;
   $("pNumero").textContent = $("numero").value;
-  $("pDate").textContent = $("date").value;
-  $("pNom").textContent = $("cNom").value || "—";
-  $("pAdr").textContent = [$("cAdr").value, $("cCp").value].filter(Boolean).join(", ");
-  $("pTel").textContent = $("cTel").value;
-  $("pSiret").textContent = $("cSiret").value ? "SIRET : "+$("cSiret").value : "";
-
-  const totOpt = lignes.reduce((s,x)=>s+(Number(x.prix)||0),0);
-  const ht = prixCrea + totOpt, tva = ht*0.2, ttc = ht+tva, ac = ht*acPct/100;
-
-  let rows = `<tr><td><div class="tdStrong">Formule ${f.label} — création du site</div><div class="tdDesc">${f.desc}</div></td><td class="right">${euro(prixCrea)}</td></tr>`;
-  lignes.forEach(l=>{ rows += `<tr><td><div class="tdStrong">${l.label||"—"}</div></td><td class="right">${euro(l.prix)}</td></tr>`; });
-  rows += `<tr><td class="grey"><div class="tdStrong">Abonnement ${f.label} (hébergement + maintenance)</div><div class="tdDesc">Engagement 12 mois, puis reconductible — facturé mensuellement</div></td><td class="right grey" style="color:#1E88C7;font-weight:700">${euro(mens)} / mois</td></tr>`;
+  $("pDate").textContent   = $("date").value;
+  $("pRef").textContent    = $("refDevis").value ? "Réf. " + $("refDevis").value : "";
+ 
+  var siret = $("siretOrtzi").value.trim();
+  $("pOrtzi").textContent      = siret ? "ORTZI — SAS" : "ORTZI — SAS en cours de formation";
+  $("pSiretOrtzi").textContent = siret ? "SIRET : " + siret : "SIRET : en cours d'immatriculation";
+  $("pMailOrtzi").textContent  = $("mailOrtzi").value;
+ 
+  $("pNom").textContent   = $("cNom").value || "—";
+  $("pAdr").textContent   = [$("cAdr").value, $("cCp").value].filter(Boolean).join(", ");
+  $("pTel").textContent   = $("cTel").value;
+  $("pSiret").textContent = $("cSiret").value ? "SIRET : " + $("cSiret").value : "";
+ 
+  var totOpt = lignes.reduce(function(s,x){ return s + (Number(x.prix)||0); }, 0);
+  var ht = prixCrea + totOpt, tva = ht*0.2, ttc = ht + tva;
+  var acHT = ht*acPct/100, acTVA = acHT*0.2, acTTC = acHT + acTVA;
+  var soldeHT = ht - acHT, soldeTVA = soldeHT*0.2, soldeTTC = soldeHT + soldeTVA;
+ 
+  var rows = "";
+  if (docType === "factAc") {
+    rows = '<tr><td><div class="tdStrong">Acompte de ' + acPct + '% sur création — Formule ' + esc(f.label) + '</div>'
+         + '<div class="tdDesc">Acompte à la commande, sur un total de ' + euro(ht) + ' HT</div></td>'
+         + '<td class="right">' + euro(acHT) + '</td></tr>';
+  } else if (docType === "factSolde") {
+    rows = '<tr><td><div class="tdStrong">Formule ' + esc(f.label) + ' — création du site</div><div class="tdDesc">' + esc(f.desc) + '</div></td><td class="right">' + euro(prixCrea) + '</td></tr>';
+    lignes.forEach(function(l){
+      rows += '<tr><td><div class="tdStrong">' + (esc(l.label)||"—") + '</div></td><td class="right">' + euro(l.prix) + '</td></tr>';
+    });
+    rows += '<tr><td class="grey"><div class="tdStrong">Acompte déjà réglé (' + acPct + '%)</div>'
+          + '<div class="tdDesc">Facture d\'acompte' + ($("refDevis").value ? " — réf. " + esc($("refDevis").value) : "") + '</div></td>'
+          + '<td class="right grey">− ' + euro(acHT) + '</td></tr>';
+  } else {
+    rows = '<tr><td><div class="tdStrong">Formule ' + esc(f.label) + ' — création du site</div><div class="tdDesc">' + esc(f.desc) + '</div></td><td class="right">' + euro(prixCrea) + '</td></tr>';
+    lignes.forEach(function(l){
+      rows += '<tr><td><div class="tdStrong">' + (esc(l.label)||"—") + '</div></td><td class="right">' + euro(l.prix) + '</td></tr>';
+    });
+    rows += '<tr><td class="grey"><div class="tdStrong">Abonnement ' + esc(f.label) + ' (hébergement + maintenance)</div>'
+          + '<div class="tdDesc">Engagement 12 mois, puis reconductible — facturé mensuellement</div></td>'
+          + '<td class="right grey" style="color:#1E88C7;font-weight:700">' + euro(mens) + ' / mois</td></tr>';
+  }
   $("pTable").innerHTML = rows;
-
-  $("pRec").textContent = euro(mens) + " / mois HT";
-  $("pCond").innerHTML =
-    `<li>Acompte de ${acPct}% à la commande (${euro(ac)} HT), solde à la livraison.</li>` +
-    `<li>Délai estimé : ${delai} semaines à réception des éléments.</li>` +
-    `<li>Garantie satisfait ou remboursé 30 jours (hors acompte).</li>` +
-    `<li>Devis valable 30 jours. Prestations soumises aux CGV Ortzi.</li>`;
-  $("pTot").innerHTML =
-    `<div class="totRow"><span>Total création HT</span><span>${euro(ht)}</span></div>` +
-    `<div class="totRow"><span>TVA 20 %</span><span>${euro(tva)}</span></div>` +
-    `<div class="totRow hi"><span>TOTAL création TTC</span><span>${euro(ttc)}</span></div>`;
+ 
+  if (isFacture) {
+    $("pRecLabel").textContent = "ABONNEMENT EN COURS";
+    $("pRec").textContent = euro(mens) + " / mois HT";
+    $("pRecNote").textContent = "Facturé séparément selon la périodicité convenue.";
+  } else {
+    $("pRecLabel").textContent = "PUIS ABONNEMENT";
+    $("pRec").textContent = euro(mens) + " / mois HT";
+    $("pRecNote").textContent = "Hébergement, maintenance et mises à jour inclus.";
+  }
+ 
+  var cond = "";
+  if (docType === "devis") {
+    cond = '<li>Acompte de ' + acPct + '% à la commande (' + euro(acHT) + ' HT), solde à la livraison.</li>'
+         + '<li>Délai estimé : ' + delai + ' semaines à réception des éléments.</li>'
+         + '<li>Garantie satisfait ou remboursé 30 jours (hors acompte).</li>'
+         + '<li>Devis valable 30 jours. Prestations soumises aux CGV Ortzi.</li>';
+  } else if (docType === "bon") {
+    cond = '<li>Acompte de ' + acPct + '% à la commande (' + euro(acHT) + ' HT), solde à la livraison.</li>'
+         + '<li>Délai estimé : ' + delai + ' semaines à réception des éléments.</li>'
+         + '<li>Engagement 12 mois sur l\'abonnement, puis reconductible.</li>'
+         + '<li>Garantie satisfait ou remboursé 30 jours (hors acompte).</li>'
+         + '<li>Prix de rachat du site (art. 10) : ' + (rachat ? euro(rachat) + ' HT' : '______ € HT') + '.</li>';
+  } else {
+    cond = '<li>Échéance de paiement : ' + (esc($("echeance").value) || "à réception de facture") + '.</li>'
+         + '<li>Pénalités de retard : taux d\'intérêt légal majoré, sans mise en demeure préalable.</li>'
+         + '<li>Indemnité forfaitaire de recouvrement : 40 € (art. L.441-10 et D.441-5 C. com.).</li>'
+         + '<li>Pas d\'escompte pour paiement anticipé.</li>';
+  }
+  $("pCond").innerHTML = cond;
+ 
+  var tot = "";
+  if (docType === "factAc") {
+    tot = '<div class="totRow sub"><span>Total commande HT</span><span>' + euro(ht) + '</span></div>'
+        + '<div class="totRow"><span>Acompte ' + acPct + '% HT</span><span>' + euro(acHT) + '</span></div>'
+        + '<div class="totRow"><span>TVA 20 %</span><span>' + euro(acTVA) + '</span></div>'
+        + '<div class="totRow hi"><span>NET À PAYER TTC</span><span>' + euro(acTTC) + '</span></div>';
+  } else if (docType === "factSolde") {
+    tot = '<div class="totRow sub"><span>Total commande HT</span><span>' + euro(ht) + '</span></div>'
+        + '<div class="totRow sub"><span>Acompte réglé HT</span><span>− ' + euro(acHT) + '</span></div>'
+        + '<div class="totRow"><span>Solde HT</span><span>' + euro(soldeHT) + '</span></div>'
+        + '<div class="totRow"><span>TVA 20 %</span><span>' + euro(soldeTVA) + '</span></div>'
+        + '<div class="totRow hi"><span>NET À PAYER TTC</span><span>' + euro(soldeTTC) + '</span></div>';
+  } else {
+    tot = '<div class="totRow"><span>Total création HT</span><span>' + euro(ht) + '</span></div>'
+        + '<div class="totRow"><span>TVA 20 %</span><span>' + euro(tva) + '</span></div>'
+        + '<div class="totRow hi"><span>TOTAL création TTC</span><span>' + euro(ttc) + '</span></div>';
+  }
+  $("pTot").innerHTML = tot;
+ 
+  if (isFacture) {
+    $("pLegal").innerHTML = siret
+      ? 'Facture émise conformément aux articles L.441-9 du Code de commerce. Prestations réservées aux professionnels.'
+      : '<strong>SIRET non renseigné :</strong> une facture ne peut être émise qu\'une fois la société immatriculée.';
+    $("pSignZone").innerHTML = "";
+  } else if (docType === "bon") {
+    $("pLegal").innerHTML = 'Le Client reconnaît avoir pris connaissance des Conditions Générales de Vente Ortzi figurant au verso et les accepter sans réserve.';
+    $("pSignZone").innerHTML =
+      '<div class="sigs">'
+      + '<div class="sig"><div class="pLabel">LE PRESTATAIRE (Ortzi)</div><div class="pLine">Nom : ____________<br>Date : ____________<br><br>Signature :</div></div>'
+      + '<div class="sig"><div class="pLabel">LE CLIENT</div><div class="pLine">Nom : ____________<br>Date : ____________<br><em>Signature précédée de « Bon pour accord »</em></div></div>'
+      + '</div>';
+  } else {
+    $("pLegal").innerHTML = "";
+    $("pSignZone").innerHTML =
+      '<div class="accord"><div class="pLabel">BON POUR ACCORD</div>'
+      + '<div class="pLine">Date : ____________     Signature (précédée de « Bon pour accord ») :</div></div>';
+  }
+ 
+  $("cgvWrap").style.display = isFacture ? "none" : "flex";
+ 
+  $("pFoot").textContent = isFacture
+    ? "ORTZI — Pays Basque (Bayonne-Anglet-Biarritz) — Prestations réservées aux professionnels."
+    : (docType === "bon"
+        ? "ORTZI — Pays Basque — CGV au verso — Le Client reconnaît en avoir pris connaissance avant signature."
+        : "ORTZI — Pays Basque — La signature du devis vaut acceptation et déclenche l'établissement du bon de commande.");
 }
-
-["numero","date","cNom","cAdr","cCp","cTel","cSiret","prixCrea","mensuel","acompte","delai"]
-  .forEach(id => $(id).addEventListener("input", render));
-
+ 
+["numero","date","refDevis","echeance","siretOrtzi","mailOrtzi","cNom","cAdr","cCp","cTel","cSiret","prixCrea","mensuel","acompte","delai","rachat"]
+  .forEach(function(id){ $(id).addEventListener("input", render); });
+ 
+// injection des CGV
+(function(){
+  var h = "";
+  CGV.forEach(function(a){
+    h += '<div class="cgvArt"><div class="cgvArtT">' + esc(a[0]) + '</div><p class="cgvArtB">' + esc(a[1]) + '</p></div>';
+  });
+  $("cgvBody").innerHTML = h;
+})();
+ 
 $("prixCrea").value = FORMULES[formule].prix;
-$("mensuel").value = FORMULES[formule].mensuel;
-renderFormuleChips(); renderLignes(); render();
+$("mensuel").value  = FORMULES[formule].mensuel;
+renderDocTabs(); renderFormuleChips(); renderLignes(); render();
 </script>
 </body>
 </html>
+ 
