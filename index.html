@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Ortzi — Générateur de devis</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin:0; background:#DFE4E9; font-family:'Segoe UI', system-ui, -apple-system, sans-serif; color:#2B3A4A; }
+  .wrap { display:flex; gap:24px; padding:20px; flex-wrap:wrap; align-items:flex-start; }
+  .editor { flex:1 1 360px; max-width:460px; display:flex; flex-direction:column; gap:14px; }
+  .brandRow { display:flex; align-items:baseline; gap:10px; }
+  .brand { font-size:30px; font-weight:800; letter-spacing:-1px; }
+  .brandSub { font-size:13px; color:#6B7885; font-weight:600; }
+  .card { background:#fff; border-radius:12px; padding:16px; box-shadow:0 1px 3px rgba(43,58,74,.08); }
+  .h { font-size:12px; font-weight:700; color:#1E88C7; text-transform:uppercase; letter-spacing:.6px; display:block; margin-bottom:8px; }
+  label.fl { font-size:11px; color:#6B7885; display:block; margin-bottom:3px; }
+  input, textarea { width:100%; border:1px solid #B9C2CC; border-radius:8px; padding:8px 10px; font-size:13px; font-family:inherit; }
+  textarea { resize:vertical; }
+  .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .fld { margin-bottom:8px; }
+  button { border:none; border-radius:8px; cursor:pointer; font-family:inherit; font-weight:600; }
+  .btn { padding:11px 16px; font-size:14px; width:100%; }
+  .btnDark { background:#2B3A4A; color:#fff; }
+  .chip { border:1px solid #B9C2CC; background:#fff; color:#2B3A4A; border-radius:20px; padding:6px 12px; font-size:12px; }
+  .chip.active { background:#1E88C7; color:#fff; border-color:#1E88C7; }
+  .row { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+  .addChip { border:1px dashed #1E88C7; background:#F5FAFD; color:#1E88C7; border-radius:8px; padding:5px 9px; font-size:11.5px; }
+  .addChip.custom { border-color:#6B7885; color:#6B7885; background:#F7F8F9; }
+  .ligne { display:flex; gap:6px; margin-bottom:6px; align-items:center; }
+  .del { background:#F0D5D2; color:#C0392B; border-radius:6px; width:30px; height:30px; font-size:18px; flex-shrink:0; }
+  .hint { font-size:11px; color:#6B7885; text-align:center; margin:0; }
+
+  .previewWrap { flex:1 1 480px; display:flex; justify-content:center; }
+  .devis { background:#fff; width:620px; max-width:100%; min-height:877px; padding:34px; box-shadow:0 4px 20px rgba(43,58,74,.15); font-size:12px; }
+  .devHeader { display:flex; justify-content:space-between; align-items:center; background:#2B3A4A; margin:-34px -34px 20px; padding:20px 34px; color:#fff; }
+  .devBrand { font-size:30px; font-weight:800; letter-spacing:-1px; }
+  .dot { color:#1E88C7; margin-left:2px; }
+  .devTitle { font-size:20px; font-weight:800; text-align:right; }
+  .devSub, .devMeta { font-size:11px; color:#B9C2CC; text-align:right; }
+  .devMeta { font-size:10px; margin-top:2px; }
+  .parties { display:flex; gap:10px; margin-bottom:16px; }
+  .partie { flex:1; border:1px solid #B9C2CC; border-radius:6px; padding:10px; }
+  .partie.grey { background:#EEF3F7; }
+  .pLabel { font-size:9px; font-weight:700; color:#1E88C7; letter-spacing:.5px; margin-bottom:5px; }
+  .pStrong { font-size:12px; font-weight:700; margin-bottom:3px; }
+  .pLine { font-size:10.5px; color:#6B7885; line-height:1.5; }
+  table { width:100%; border-collapse:collapse; margin-bottom:16px; }
+  th { background:#2B3A4A; color:#fff; font-size:10px; padding:7px 10px; text-align:right; }
+  th.left { text-align:left; }
+  td { border:1px solid #E0E5EA; padding:9px 10px; vertical-align:middle; }
+  td.right { text-align:right; }
+  td.grey { background:#EEF3F7; }
+  .tdStrong { font-size:11.5px; font-weight:700; }
+  .tdDesc { font-size:9.5px; color:#8A97A3; margin-top:2px; }
+  .bottom { display:flex; gap:16px; margin-bottom:16px; }
+  .recurrent { flex:1; }
+  .recBig { font-size:16px; font-weight:800; margin-bottom:3px; }
+  .condList { margin:4px 0 0; padding:0; list-style:none; font-size:10px; color:#6B7885; line-height:1.7; }
+  .totaux { width:220px; align-self:flex-start; }
+  .totRow { display:flex; justify-content:space-between; border:1px solid #E0E5EA; padding:7px 10px; font-size:11px; }
+  .totRow.hi { background:#1E88C7; color:#fff; font-weight:700; border:none; }
+  .accord { border:1px solid #B9C2CC; border-radius:6px; padding:12px; margin-bottom:14px; }
+  .devFoot { font-size:9px; color:#8A97A3; text-align:center; border-top:1px solid #E0E5EA; padding-top:10px; }
+
+  @media print {
+    .no-print { display:none !important; }
+    body { background:#fff; }
+    .wrap { padding:0; gap:0; }
+    .previewWrap { display:block; }
+    .devis { box-shadow:none; width:100%; min-height:0; padding:0; }
+    .devHeader { margin:0 0 20px; padding:16px 20px; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    th, .totRow.hi, .partie.grey, td.grey { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    @page { size:A4; margin:12mm; }
+  }
+  @media (max-width:900px) { .devis { width:100%; padding:20px; } .devHeader { margin:-20px -20px 16px; padding:16px 20px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== SAISIE ===== -->
+  <div class="editor no-print">
+    <div class="brandRow"><span class="brand">ortzi</span><span class="brandSub">Générateur de devis</span></div>
+
+    <div class="card">
+      <span class="h">Devis</span>
+      <div class="grid2">
+        <div class="fld"><label class="fl">N° de devis</label><input id="numero" value="DEV-2026-001"></div>
+        <div class="fld"><label class="fl">Date</label><input id="date"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="h">Client</span>
+      <div class="fld"><label class="fl">Nom / raison sociale</label><input id="cNom"></div>
+      <div class="grid2">
+        <div class="fld"><label class="fl">Adresse</label><input id="cAdr"></div>
+        <div class="fld"><label class="fl">CP / Ville</label><input id="cCp"></div>
+      </div>
+      <div class="grid2">
+        <div class="fld"><label class="fl">Téléphone</label><input id="cTel"></div>
+        <div class="fld"><label class="fl">SIRET</label><input id="cSiret"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="h">Formule</span>
+      <div class="row" id="formuleChips"></div>
+      <div class="grid2">
+        <div class="fld"><label class="fl">Prix création HT (€)</label><input id="prixCrea" type="number"></div>
+        <div class="fld"><label class="fl">Abonnement HT (€/mois)</label><input id="mensuel" type="number"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="h">Options & lignes</span>
+      <div class="row" id="optChips"></div>
+      <div id="lignes"></div>
+    </div>
+
+    <div class="card">
+      <span class="h">Conditions</span>
+      <div class="grid2">
+        <div class="fld"><label class="fl">Acompte (%)</label><input id="acompte" type="number" value="30"></div>
+        <div class="fld"><label class="fl">Délai (semaines)</label><input id="delai" type="number" value="4"></div>
+      </div>
+    </div>
+
+    <button class="btn btnDark" onclick="window.print()">Imprimer / Exporter en PDF</button>
+    <p class="hint">Dans la fenêtre d'impression, choisissez « Enregistrer en PDF ».</p>
+  </div>
+
+  <!-- ===== APERÇU ===== -->
+  <div class="previewWrap">
+    <div class="devis">
+      <div class="devHeader">
+        <div class="devBrand">ortzi<span class="dot">•</span></div>
+        <div>
+          <div class="devTitle">DEVIS</div>
+          <div class="devSub">Création de site internet</div>
+          <div class="devMeta"><span id="pNumero"></span> — <span id="pDate"></span></div>
+        </div>
+      </div>
+
+      <div class="parties">
+        <div class="partie grey">
+          <div class="pLabel">ÉMETTEUR</div>
+          <div class="pStrong">ORTZI — SAS en cours de formation</div>
+          <div class="pLine">Pays Basque (Bayonne-Anglet-Biarritz)</div>
+          <div class="pLine">SIRET : en cours d'immatriculation</div>
+        </div>
+        <div class="partie">
+          <div class="pLabel">CLIENT</div>
+          <div class="pStrong" id="pNom">—</div>
+          <div class="pLine" id="pAdr"></div>
+          <div class="pLine" id="pTel"></div>
+          <div class="pLine" id="pSiret"></div>
+        </div>
+      </div>
+
+      <table>
+        <thead><tr><th class="left">Désignation</th><th>Total HT</th></tr></thead>
+        <tbody id="pTable"></tbody>
+      </table>
+
+      <div class="bottom">
+        <div class="recurrent">
+          <div class="pLabel">PUIS ABONNEMENT</div>
+          <div class="recBig" id="pRec"></div>
+          <div class="pLine">Hébergement, maintenance et mises à jour inclus.</div>
+          <div class="pLabel" style="margin-top:14px">CONDITIONS</div>
+          <ul class="condList" id="pCond"></ul>
+        </div>
+        <div class="totaux" id="pTot"></div>
+      </div>
+
+      <div class="accord">
+        <div class="pLabel">BON POUR ACCORD</div>
+        <div class="pLine">Date : ____________     Signature (précédée de « Bon pour accord ») :</div>
+      </div>
+
+      <div class="devFoot">ORTZI — SAS en cours de formation — Pays Basque — La signature du devis vaut acceptation et déclenche l'établissement du bon de commande.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const FORMULES = {
+  "vitrine-3d": { label:"Vitrine 3D", desc:"Site vitrine premium avec animations 3D interactives (WebGL)", prix:2500, mensuel:69 },
+  "vitrine":    { label:"Vitrine", desc:"Site 1 à 5 pages, responsive, formulaire de contact", prix:490, mensuel:39 },
+  "pro":        { label:"Pro", desc:"Site multi-pages, blog/actualités, SEO de base, sur-mesure", prix:890, mensuel:59 },
+  "ecommerce":  { label:"E-commerce", desc:"Boutique en ligne, paiement, gestion produits & commandes", prix:1490, mensuel:89 },
+};
+const OPTIONS_DEF = [
+  {label:"Prise de rendez-vous en ligne", prix:150},
+  {label:"Pages supplémentaires", prix:0},
+  {label:"Rédaction de contenu", prix:250},
+  {label:"Photos / shooting", prix:300},
+  {label:"Logo / identité visuelle", prix:0},
+  {label:"Multilingue (FR / ES / EU)", prix:0},
+];
+
+let formule = "pro";
+let lignes = [];
+
+const $ = id => document.getElementById(id);
+const euro = n => (Number(n)||0).toLocaleString("fr-FR",{minimumFractionDigits:2,maximumFractionDigits:2}) + " €";
+
+$("date").value = new Date().toLocaleDateString("fr-FR");
+
+// chips formules
+function renderFormuleChips(){
+  $("formuleChips").innerHTML = "";
+  Object.entries(FORMULES).forEach(([k,f])=>{
+    const b = document.createElement("button");
+    b.className = "chip" + (formule===k ? " active" : "");
+    b.textContent = f.label;
+    b.onclick = ()=>{ formule=k; $("prixCrea").value=f.prix; $("mensuel").value=f.mensuel; renderFormuleChips(); render(); };
+    $("formuleChips").appendChild(b);
+  });
+}
+// chips options
+OPTIONS_DEF.forEach(o=>{
+  const b=document.createElement("button");
+  b.className="addChip"; b.textContent="+ "+o.label;
+  b.onclick=()=>{ lignes.push({label:o.label,prix:o.prix}); renderLignes(); render(); };
+  document.getElementById("optChips").appendChild(b);
+});
+{
+  const b=document.createElement("button");
+  b.className="addChip custom"; b.textContent="+ Ligne libre";
+  b.onclick=()=>{ lignes.push({label:"",prix:0}); renderLignes(); render(); };
+  document.getElementById("optChips").appendChild(b);
+}
+
+function renderLignes(){
+  const c=$("lignes"); c.innerHTML="";
+  lignes.forEach((l,i)=>{
+    const d=document.createElement("div"); d.className="ligne";
+    const a=document.createElement("input"); a.value=l.label; a.placeholder="Désignation"; a.style.flex="1";
+    a.oninput=e=>{ lignes[i].label=e.target.value; render(); };
+    const p=document.createElement("input"); p.type="number"; p.value=l.prix; p.style.width="90px";
+    p.oninput=e=>{ lignes[i].prix=e.target.value; render(); };
+    const x=document.createElement("button"); x.className="del"; x.textContent="×";
+    x.onclick=()=>{ lignes.splice(i,1); renderLignes(); render(); };
+    d.append(a,p,x); c.appendChild(d);
+  });
+}
+
+function render(){
+  const f = FORMULES[formule];
+  const prixCrea = Number($("prixCrea").value)||0;
+  const mens = Number($("mensuel").value)||0;
+  const acPct = Number($("acompte").value)||0;
+  const delai = Number($("delai").value)||0;
+
+  $("pNumero").textContent = $("numero").value;
+  $("pDate").textContent = $("date").value;
+  $("pNom").textContent = $("cNom").value || "—";
+  $("pAdr").textContent = [$("cAdr").value, $("cCp").value].filter(Boolean).join(", ");
+  $("pTel").textContent = $("cTel").value;
+  $("pSiret").textContent = $("cSiret").value ? "SIRET : "+$("cSiret").value : "";
+
+  const totOpt = lignes.reduce((s,x)=>s+(Number(x.prix)||0),0);
+  const ht = prixCrea + totOpt, tva = ht*0.2, ttc = ht+tva, ac = ht*acPct/100;
+
+  let rows = `<tr><td><div class="tdStrong">Formule ${f.label} — création du site</div><div class="tdDesc">${f.desc}</div></td><td class="right">${euro(prixCrea)}</td></tr>`;
+  lignes.forEach(l=>{ rows += `<tr><td><div class="tdStrong">${l.label||"—"}</div></td><td class="right">${euro(l.prix)}</td></tr>`; });
+  rows += `<tr><td class="grey"><div class="tdStrong">Abonnement ${f.label} (hébergement + maintenance)</div><div class="tdDesc">Engagement 12 mois, puis reconductible — facturé mensuellement</div></td><td class="right grey" style="color:#1E88C7;font-weight:700">${euro(mens)} / mois</td></tr>`;
+  $("pTable").innerHTML = rows;
+
+  $("pRec").textContent = euro(mens) + " / mois HT";
+  $("pCond").innerHTML =
+    `<li>Acompte de ${acPct}% à la commande (${euro(ac)} HT), solde à la livraison.</li>` +
+    `<li>Délai estimé : ${delai} semaines à réception des éléments.</li>` +
+    `<li>Garantie satisfait ou remboursé 30 jours (hors acompte).</li>` +
+    `<li>Devis valable 30 jours. Prestations soumises aux CGV Ortzi.</li>`;
+  $("pTot").innerHTML =
+    `<div class="totRow"><span>Total création HT</span><span>${euro(ht)}</span></div>` +
+    `<div class="totRow"><span>TVA 20 %</span><span>${euro(tva)}</span></div>` +
+    `<div class="totRow hi"><span>TOTAL création TTC</span><span>${euro(ttc)}</span></div>`;
+}
+
+["numero","date","cNom","cAdr","cCp","cTel","cSiret","prixCrea","mensuel","acompte","delai"]
+  .forEach(id => $(id).addEventListener("input", render));
+
+$("prixCrea").value = FORMULES[formule].prix;
+$("mensuel").value = FORMULES[formule].mensuel;
+renderFormuleChips(); renderLignes(); render();
+</script>
+</body>
+</html>
